@@ -21,7 +21,7 @@ module Sharepoint
 
   class Site
     attr_reader   :server_url
-    attr_accessor :url, :protocole
+    attr_accessor :url, :protocol
     attr_accessor :session
     attr_accessor :name
     attr_accessor :verbose
@@ -32,16 +32,16 @@ module Sharepoint
       @url         = "#{@server_url}/#{@name}"
       @session     = Session.new self
       @web_context = nil
-      @protocole   = 'https'
+      @protocol    = 'https'
       @verbose     = false
     end
 
     def authentication_path
-      "#{@protocole}://#{@server_url}/_forms/default.aspx?wa=wsignin1.0"
+      "#{@protocol}://#{@server_url}/_forms/default.aspx?wa=wsignin1.0"
     end
 
     def api_path uri
-      "#{@protocole}://#{@url}/_api/web/#{uri}"
+      "#{@protocol}://#{@url}/_api/web/#{uri}"
     end
 
     def filter_path uri
@@ -58,7 +58,7 @@ module Sharepoint
     def form_digest
       if @web_context.nil? or (not @web_context.is_up_to_date?)
         @getting_form_digest = true
-        @web_context         = query :post, "#{@protocole}://#{@server_url}/_api/contextinfo"
+        @web_context         = query :post, "#{@protocol}://#{@server_url}/_api/contextinfo"
         @getting_form_digest = false
       end
       @web_context.form_digest_value
@@ -114,6 +114,8 @@ module Sharepoint
     # and return the corresponding Sharepoint::Object.
     def make_object_from_data data
       type_name  = data['__metadata']['type'].gsub(/^SP\./, '')
+                                             .gsub(/^Collection\(Edm\.String\)/, 'CollectionString')
+                                             .gsub(/^Collection\(Edm\.Int32\)/, 'CollectionInteger')
       type_parts = type_name.split '.'
       type_name  = type_parts.pop
       constant   = Sharepoint

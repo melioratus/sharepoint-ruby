@@ -12,9 +12,9 @@ require 'sharepoint-ruby'
 site = Sharepoint::Site.new 'mysite.sharepoint.com', 'server-relative-site-url'
 site.session.authenticate 'mylogin', 'mypassword'
 
-blog = SharePoint::Site.new 'mytenant.sharepoint.com', 'sites/blog'
-site.session.authenticate 'user', 'pwd'
-lists = site.lists
+blog = Sharepoint::Site.new 'mytenant.sharepoint.com', 'sites/blog'
+blog.session.authenticate 'user', 'pwd'
+lists = blog.lists
 for l in lists
   puts l.title
 end
@@ -39,6 +39,19 @@ require 'sharepoint-http-auth'
 
 site = Sharepoint::Site.new 'mysite.sharepoint.com', 'site-name'
 site.session = Sharepoint::HttpAuth::Session.new site
+site.session.authenticate 'login', 'password'
+site.protocole = 'http' # default protocole is https: don't forget to set this if you use http.
+```
+
+### Connecting using Kerberos
+You may also connect using Kerberos if you're using *MIT Kerberos*. 
+For that purpose, you'll have to overwrite the default session handler with `Sharepoint::KerberosAuth::Session`.
+
+```Ruby
+require 'sharepoint-kerberos-auth'
+
+site = Sharepoint::Site.new 'mysite.sharepoint.com', 'site-name'
+site.session = Sharepoint::KerberosAuth::Session.new site
 site.session.authenticate 'login', 'password'
 site.protocole = 'http' # default protocole is https: don't forget to set this if you use http.
 ```
